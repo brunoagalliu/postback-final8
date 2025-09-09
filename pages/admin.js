@@ -277,7 +277,7 @@ export default function AdminDashboard() {
                             </button>
                         </div>
                         <div style={{ marginTop: '10px', fontSize: '14px', color: '#666' }}>
-                            <strong>Note:</strong> The automated daily postback now runs via Vercel Cron at 11:59 PM UTC (approximately 6:59 PM EST/7:59 PM EDT) every day. 
+                            <strong>Note:</strong> The automated daily postback now runs via Vercel Cron at 11:59 PM Eastern Time every day. 
                             Use "Force Daily Check" to test the automation logic immediately, or "Send Daily Postback Now" for manual execution.
                         </div>
                     </div>

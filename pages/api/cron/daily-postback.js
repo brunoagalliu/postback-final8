@@ -31,7 +31,7 @@ import {
       return res.status(200).json({
         success: true,
         timestamp: new Date().toISOString(),
-        timezone: 'UTC (cron runs in UTC, converts to NY time internally)',
+        timezone: 'Cron runs at 11:59 PM Eastern Time (4:59 AM UTC)',
         ...result
       });
   
