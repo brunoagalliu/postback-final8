@@ -8,20 +8,12 @@ import {
   logConversion,
   logPostback
  } from '../../lib/database.js';
- import { checkAndRunDailyPostback } from '../../lib/scheduler.js';
  
  export default async function handler(req, res) {
   try {
     await initializeDatabase();
     
-    // Check if we should run the daily postback (non-blocking)
-    checkAndRunDailyPostback().then(result => {
-      if (!result.skipped) {
-        console.log('Daily postback check result:', result);
-      }
-    }).catch(error => {
-      console.error('Daily postback check failed:', error);
-    });
+
     
     const { clickid, sum } = req.query;
     const sumValue = parseFloat(sum || 0);

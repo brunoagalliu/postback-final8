@@ -68,6 +68,29 @@ export default function AdminDashboard() {
         }
     };
 
+    const forceDailyCheck = async () => {
+        if (!confirm('Force the daily postback check right now (bypasses time window)? This will execute if there are cached conversions.')) {
+            return;
+        }
+
+        try {
+            const response = await fetch('/api/admin/force-daily-check', {
+                method: 'POST'
+            });
+            const data = await response.json();
+            
+            if (data.success) {
+                alert(`Force daily check successful!\n\nTotal Amount: $${data.totalAmount.toFixed(2)}\nClickid Used: ${data.clickidUsed || 'N/A'}\nCache Entries Cleared: ${data.clearedEntries || 0}`);
+            } else {
+                alert(`Force daily check completed.\n\nMessage: ${data.message}\nTotal Amount: $${data.totalAmount?.toFixed(2) || '0.00'}\nError: ${data.error || 'None'}`);
+            }
+            
+            fetchStats(); // Refresh stats
+        } catch (err) {
+            alert('Error forcing daily check: ' + err.message);
+        }
+    };
+
     useEffect(() => {
         fetchStats();
         const interval = setInterval(fetchStats, 30000); // Refresh every 30 seconds
@@ -111,6 +134,20 @@ export default function AdminDashboard() {
                         }}
                     >
                         Manual Daily Postback
+                    </button>
+
+                    <button 
+                        onClick={forceDailyCheck}
+                        style={{
+                            padding: '8px 16px',
+                            background: '#17a2b8',
+                            color: 'white',
+                            border: 'none',
+                            borderRadius: '4px',
+                            cursor: 'pointer'
+                        }}
+                    >
+                        Force Daily Check Now
                     </button>
                 </div>
             </header>
@@ -192,9 +229,9 @@ export default function AdminDashboard() {
                         borderRadius: '8px',
                         marginBottom: '30px'
                     }}>
-                        <h3>Global Cache Management</h3>
+                        <h3>Global Cache Management & Daily Postback</h3>
                         <p style={{ marginBottom: '15px', color: '#666' }}>
-                            Clear the entire global cache (all cached conversions from all clickids) or trigger the daily postback manually
+                            Manage the global cache or trigger postbacks manually. The automated daily postback runs at 11:45-11:59 PM New York time when conversion requests are received.
                         </p>
                         <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
                             <button 
@@ -224,10 +261,24 @@ export default function AdminDashboard() {
                             >
                                 Send Daily Postback Now
                             </button>
+
+                            <button 
+                                onClick={forceDailyCheck}
+                                style={{
+                                    padding: '8px 16px',
+                                    background: '#17a2b8',
+                                    color: 'white',
+                                    border: 'none',
+                                    borderRadius: '4px',
+                                    cursor: 'pointer'
+                                }}
+                            >
+                                Force Daily Check (Bypass Time Window)
+                            </button>
                         </div>
                         <div style={{ marginTop: '10px', fontSize: '14px', color: '#666' }}>
-                            <strong>Note:</strong> The daily postback automatically runs at 11:59 PM New York time when any conversion request is received. 
-                            Use "Send Daily Postback Now" to manually trigger it for testing purposes.
+                            <strong>Note:</strong> The automated daily postback now runs via Vercel Cron at 11:59 PM UTC (approximately 6:59 PM EST/7:59 PM EDT) every day. 
+                            Use "Force Daily Check" to test the automation logic immediately, or "Send Daily Postback Now" for manual execution.
                         </div>
                     </div>
 
