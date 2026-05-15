@@ -1,7 +1,12 @@
 // File: pages/api/admin/clear-cache.js
 import { clearAllCachedConversions, logConversion } from '../../../lib/database.js';
+import { getSessionFromRequest } from '../../../lib/auth.js';
 
 export default async function handler(req, res) {
+  if (!getSessionFromRequest(req)) {
+    return res.status(401).json({ message: 'Unauthorized' });
+  }
+
   if (req.method !== 'POST') {
     return res.status(405).json({ message: 'Method not allowed' });
   }

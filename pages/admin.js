@@ -1,8 +1,19 @@
 // File: pages/admin.js
 import { useState, useEffect } from 'react';
 import Head from 'next/head';
+import { useRouter } from 'next/router';
+import { getSessionFromRequest } from '../lib/auth.js';
 
-export default function AdminDashboard() {
+export async function getServerSideProps({ req }) {
+    const session = getSessionFromRequest(req);
+    if (!session) {
+        return { redirect: { destination: '/login', permanent: false } };
+    }
+    return { props: { username: session.username } };
+}
+
+export default function AdminDashboard({ username }) {
+    const router = useRouter();
     const [stats, setStats] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
@@ -104,9 +115,22 @@ export default function AdminDashboard() {
                 <meta name="description" content="Conversion tracking admin dashboard" />
             </Head>
 
-            <header style={{ marginBottom: '30px' }}>
-                <h1>Conversion Tracking Admin Dashboard</h1>
-                <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
+            <header style={{ marginBottom: '30px', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '10px' }}>
+                <div>
+                    <h1 style={{ margin: '0 0 12px 0' }}>Conversion Tracking Admin Dashboard</h1>
+                    <div style={{ fontSize: '13px', color: '#666' }}>Signed in as <strong>{username}</strong></div>
+                </div>
+                <button
+                    onClick={async () => {
+                        await fetch('/api/auth/logout', { method: 'POST' });
+                        router.push('/login');
+                    }}
+                    style={{ padding: '8px 16px', background: '#6c757d', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer' }}
+                >
+                    Sign Out
+                </button>
+            </header>
+            <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap', marginBottom: '20px' }}>
                     <button 
                         onClick={fetchStats}
                         disabled={loading}
@@ -150,7 +174,6 @@ export default function AdminDashboard() {
                         Force Daily Check Now
                     </button>
                 </div>
-            </header>
 
             {error && (
                 <div style={{ 

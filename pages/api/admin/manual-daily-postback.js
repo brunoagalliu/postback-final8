@@ -1,5 +1,6 @@
 // File: pages/api/admin/manual-daily-postback.js
 import { logConversion } from '../../../lib/database.js';
+import { getSessionFromRequest } from '../../../lib/auth.js';
 
 // Import the execution function directly to bypass time checks
 async function executeDailyPostback() {
@@ -123,6 +124,10 @@ async function executeDailyPostback() {
 }
 
 export default async function handler(req, res) {
+  if (!getSessionFromRequest(req)) {
+    return res.status(401).json({ message: 'Unauthorized' });
+  }
+
   if (req.method !== 'POST') {
     return res.status(405).json({ message: 'Method not allowed' });
   }

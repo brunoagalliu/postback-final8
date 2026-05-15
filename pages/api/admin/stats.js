@@ -1,7 +1,11 @@
 // File: pages/api/admin/stats.js
 import { getPool } from '../../../lib/database.js';
+import { getSessionFromRequest } from '../../../lib/auth.js';
 
 export default async function handler(req, res) {
+  if (!getSessionFromRequest(req)) {
+    return res.status(401).json({ message: 'Unauthorized' });
+  }
   try {
     const pool = getPool();
 

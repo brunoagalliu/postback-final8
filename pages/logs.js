@@ -1,6 +1,15 @@
 // File: pages/logs.js
 import { useState, useEffect } from 'react';
 import Head from 'next/head';
+import { getSessionFromRequest } from '../lib/auth.js';
+
+export async function getServerSideProps({ req }) {
+    const session = getSessionFromRequest(req);
+    if (!session) {
+        return { redirect: { destination: '/login', permanent: false } };
+    }
+    return { props: {} };
+}
 
 export default function LogsViewer() {
     const [logs, setLogs] = useState('');
